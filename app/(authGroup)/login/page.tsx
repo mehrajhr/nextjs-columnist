@@ -3,12 +3,10 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import LoginForm from "../_components/LoginForm";
-import LoginButton from "../_components/LoginButton";
 
 const LoginPage = () => {
   return (
@@ -26,9 +24,6 @@ const LoginPage = () => {
         <CardContent>
           <LoginForm></LoginForm>
         </CardContent>
-        <CardFooter className="flex-col gap-2">
-          <LoginButton></LoginButton>
-        </CardFooter>
       </Card>
     </div>
   );

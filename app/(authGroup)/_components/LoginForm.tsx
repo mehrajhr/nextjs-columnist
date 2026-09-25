@@ -3,11 +3,13 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import React from "react";
+import { loginAction } from "../_actions/authAction";
+import { Button } from "@/components/ui/button";
 
 const LoginForm = () => {
   return (
-    <form>
-      <div className="flex flex-col gap-6">
+    <form action={loginAction} className="flex flex-col gap-6">
+      <div className="flex flex-col gap-4">
         <div className="grid gap-2">
           <Label htmlFor="email">Email</Label>
           <Input
@@ -35,6 +37,9 @@ const LoginForm = () => {
           />
         </div>
       </div>
+      <Button type="submit" className="w-full">
+        Login
+      </Button>
     </form>
   );
 };
