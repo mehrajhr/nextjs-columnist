@@ -6,9 +6,11 @@ import React, { useActionState, useEffect } from "react";
 import { loginAction } from "../_actions/authAction";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const LoginForm = () => {
   const [state, action, pending] = useActionState(loginAction, false);
+  const router = useRouter();
 
   useEffect(() => {
     if (!state || pending) {
@@ -17,6 +19,9 @@ const LoginForm = () => {
 
     if (state.success) {
       toast.success(state.message || "Login successfully");
+
+    //   client side navigation redirecting 
+      router.replace("/dashboard");
     } else {
       toast.error(state.message || "Login failed");
     }

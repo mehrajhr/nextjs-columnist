@@ -1,6 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 type LoginState = {
   success: boolean;
@@ -37,7 +38,7 @@ export const loginAction = async (
     body: JSON.stringify(payload),
   });
 
-  const result: LoginState = await res.json();
+  const result = await res.json();
 
   console.log(result);
 
@@ -56,6 +57,9 @@ export const loginAction = async (
       sameSite: "none",
       maxAge: 1000 * 60 * 60 * 24 * 7,
     });
+
+    // server side navigation redirecting
+    // redirect("/dashboard", "replace");
   }
 
   return result;
