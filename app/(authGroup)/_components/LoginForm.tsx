@@ -2,13 +2,27 @@
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import React from "react";
+import React, { useActionState, useEffect } from "react";
 import { loginAction } from "../_actions/authAction";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 const LoginForm = () => {
+  const [state, action, pending] = useActionState(loginAction, false);
+
+  useEffect(() => {
+    if (!state || pending) {
+      return;
+    }
+
+    if (state.success) {
+      toast.success(state.message || "Login successfully");
+    } else {
+      toast.error(state.message || "Login failed");
+    }
+  });
   return (
-    <form action={loginAction} className="flex flex-col gap-6">
+    <form action={action} className="flex flex-col gap-6">
       <div className="flex flex-col gap-4">
         <div className="grid gap-2">
           <Label htmlFor="email">Email</Label>
@@ -38,7 +52,7 @@ const LoginForm = () => {
         </div>
       </div>
       <Button type="submit" className="w-full">
-        Login
+        {pending ? "Submitting..." : "Login"}
       </Button>
     </form>
   );

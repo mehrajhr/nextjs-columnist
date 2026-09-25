@@ -1,16 +1,31 @@
 import "./globals.css";
 import { Outfit, Oxanium } from "next/font/google";
 import { cn } from "@/lib/utils";
+import { Toaster } from "sonner";
 
-const oxaniumHeading = Oxanium({subsets:['latin'],variable:'--font-heading'});
+const oxaniumHeading = Oxanium({
+  subsets: ["latin"],
+  variable: "--font-heading",
+});
 
-const outfit = Outfit({subsets:['latin'],variable:'--font-sans'});
-
+const outfit = Outfit({ subsets: ["latin"], variable: "--font-sans" });
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={cn("h-full", "antialiased", "font-sans", outfit.variable, oxaniumHeading.variable)}>
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html
+      lang="en"
+      className={cn(
+        "h-full",
+        "antialiased",
+        "font-sans",
+        outfit.variable,
+        oxaniumHeading.variable,
+      )}
+    >
+      <body className="min-h-full flex flex-col">
+        <Toaster position="top-right"/>
+        {children}
+      </body>
     </html>
   );
 }
