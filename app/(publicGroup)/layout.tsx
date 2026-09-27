@@ -2,14 +2,15 @@ import { Navbar } from "@/components/shared/navbar";
 import { getMe } from "@/service/getMe";
 import React from "react";
 
-const AuthLayout = async ({ children }: { children: React.ReactNode }) => {
+const PublicLayout = async ({ children }: { children: React.ReactNode }) => {
   const user = await getMe();
+  //   console.log(user);
   return (
     <div>
       <Navbar user={user} />
-      <div className="max-w-7xl mx-auto">{children}</div>
+      {children}
     </div>
   );
 };
 
-export default AuthLayout;
+export default PublicLayout;

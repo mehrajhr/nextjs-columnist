@@ -2,7 +2,6 @@ import "./globals.css";
 import { Outfit, Oxanium } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { Toaster } from "sonner";
-import { Navbar } from "@/components/shared/navbar";
 
 const oxaniumHeading = Oxanium({
   subsets: ["latin"],
@@ -11,7 +10,7 @@ const oxaniumHeading = Oxanium({
 
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-sans" });
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
@@ -24,8 +23,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       )}
     >
       <body className="min-h-full flex flex-col">
-        <Navbar />
-        <Toaster position="top-right"/>
+        <Toaster position="top-right" />
         {children}
       </body>
     </html>

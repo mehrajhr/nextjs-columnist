@@ -66,7 +66,8 @@ function NavLinks({ mobile = false }: { mobile?: boolean }) {
   );
 }
 
-function UserMenu() {
+function UserMenu({user}: NavbarProps) {
+  console.log(user);
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -81,7 +82,7 @@ function UserMenu() {
             </AvatarFallback>
           </Avatar>
           <span className="hidden text-sm font-medium sm:inline">
-            Jordan Davis
+            {user?.data?.profile?.name || "Name"}
           </span>
           <ChevronDownIcon className="hidden size-4 text-muted-foreground sm:inline" />
         </Button>
@@ -90,9 +91,9 @@ function UserMenu() {
         <DropdownMenuGroup>
           <DropdownMenuLabel>
             <div className="flex flex-col gap-1">
-              <span>Jordan Davis</span>
+              <span>{user?.data?.profile?.name || "Name"}</span>
               <span className="font-normal text-muted-foreground">
-                jordan@example.com
+                {user?.data?.profile?.email || "Email"}
               </span>
             </div>
           </DropdownMenuLabel>
@@ -119,7 +120,28 @@ function UserMenu() {
   );
 }
 
-export function Navbar() {
+type IUser = {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  data: { 
+    profile: {
+      id: string;
+      name: string;
+      email: string;
+      activeStatus: string;
+      role: string;
+      createdAt: string;
+      updatedAt: string;
+    }
+  }
+}
+
+type NavbarProps = {
+  user : IUser;
+}
+
+export function Navbar({ user }: NavbarProps) {
   return (
     <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80">
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-6 px-4 sm:px-6">
@@ -146,7 +168,7 @@ export function Navbar() {
           </SheetContent>
         </Sheet>
         <Link
-          href="#overview"
+          href="/"
           className="flex shrink-0 items-center gap-2"
           aria-label="Northstar home"
         >
@@ -163,7 +185,7 @@ export function Navbar() {
           >
             <BellIcon />
           </Button>
-          <UserMenu />
+          <UserMenu user={user} />
         </div>
       </div>
     </header>
