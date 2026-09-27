@@ -30,6 +30,10 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { logout } from "@/service/logout";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const navItems = [
   { label: "Home", href: "/" },
@@ -66,7 +70,22 @@ function NavLinks({ mobile = false }: { mobile?: boolean }) {
   );
 }
 
-function UserMenu({user}: NavbarProps) {
+const handleUserAction = async (
+  action: string,
+  setIsLoggedOut: React.Dispatch<React.SetStateAction<boolean>>,
+) => {
+  if (action === "sign-out") {
+    await logout();
+    setIsLoggedOut(true);
+  }
+};
+
+type UserMenuProps = {
+  user: IUser;
+  setIsLoggedOut: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+function UserMenu({ user, setIsLoggedOut }: UserMenuProps) {
   console.log(user);
   return (
     <DropdownMenu>
@@ -111,7 +130,12 @@ function UserMenu({user}: NavbarProps) {
           })}
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem variant="destructive" onClick={() => undefined}>
+        <DropdownMenuItem
+          variant="destructive"
+          onClick={async () =>
+            await handleUserAction("sign-out", setIsLoggedOut)
+          }
+        >
           <LogOutIcon />
           Sign out
         </DropdownMenuItem>
@@ -124,7 +148,7 @@ type IUser = {
   success: boolean;
   statusCode: number;
   message: string;
-  data: { 
+  data: {
     profile: {
       id: string;
       name: string;
@@ -133,15 +157,24 @@ type IUser = {
       role: string;
       createdAt: string;
       updatedAt: string;
-    }
-  }
-}
+    };
+  };
+};
 
 type NavbarProps = {
-  user : IUser;
-}
+  user: IUser;
+};
 
 export function Navbar({ user }: NavbarProps) {
+  const [isLoggedOut, setIsLoggedOut] = useState(false);
+  const router = useRouter();
+  useEffect(() => {
+    if (isLoggedOut) {
+      toast.success("Successfully logged out");
+      router.push("/login");
+    }
+  }, [isLoggedOut, router]);
+
   return (
     <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80">
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-6 px-4 sm:px-6">
@@ -177,15 +210,22 @@ export function Navbar({ user }: NavbarProps) {
 
         <NavLinks />
         <div className="ml-auto flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="hidden sm:inline-flex"
-            aria-label="Notifications"
-          >
-            <BellIcon />
-          </Button>
-          <UserMenu user={user} />
+          {user?.success ? (
+            <>
+              {" "}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="hidden sm:inline-flex"
+                aria-label="Notifications"
+              ></Button>
+              <UserMenu user={user} setIsLoggedOut={setIsLoggedOut} />
+            </>
+          ) : (
+            <Link href="/login">
+              <Button variant="default" className="cursor-pointer">Login</Button>
+            </Link>
+          )}
         </div>
       </div>
     </header>

@@ -20,6 +20,12 @@ export const getMe = async () => {
     headers: {
       Authorization: `${accessToken}`,
     },
+
+    cache: "force-cache",
+    next:{
+      revalidate: 60 * 60 * 24, // 1 day
+      tags: ["my-profile"],
+    }
   });
 
   const result = res.json();
