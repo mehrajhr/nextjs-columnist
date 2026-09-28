@@ -13,6 +13,31 @@ type LoginState = {
   };
 };
 
+type RegisterState = {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  data?: {
+    user: {
+      id: string;
+      name: string;
+      email: string;
+      activeStatus: string;
+      role: string;
+      createdAt: string;
+      updatedAt: string;
+      profile: {
+        id: string;
+        profilePhoto: string;
+        bio: string | null;
+        userId: string;
+        createdAt: string;
+        updatedAt: string;
+      };
+    };
+  };
+};
+
 export const loginAction = async (
   prevState: LoginState,
   formData: FormData,
@@ -62,5 +87,33 @@ export const loginAction = async (
     // redirect("/dashboard", "replace");
   }
 
+  return result;
+};
+
+export const registerAction = async (
+  prevState: RegisterState,
+  formData: FormData,
+) => {
+  const name = formData.get("name");
+  const email = formData.get("email");
+  const password = formData.get("password");
+  const profilePhoto = formData.get("profilePhoto"); // Optional field
+
+  const payload = {
+    name,
+    email,
+    password,
+    ...(profilePhoto ? { profilePhoto } : {}),
+  };
+
+  const res = await fetch(`${process.env.API_BACKEND_URL}/api/users/register`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const result = await res.json();
   return result;
 };

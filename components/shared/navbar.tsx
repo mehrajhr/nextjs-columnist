@@ -222,9 +222,18 @@ export function Navbar({ user }: NavbarProps) {
               <UserMenu user={user} setIsLoggedOut={setIsLoggedOut} />
             </>
           ) : (
-            <Link href="/login">
-              <Button variant="default" className="cursor-pointer">Login</Button>
-            </Link>
+            <div className="flex gap-2">
+              <Link href="/register">
+                <Button variant="secondary" className="cursor-pointer">
+                  Register
+                </Button>
+              </Link>
+              <Link href="/login">
+                <Button variant="default" className="cursor-pointer">
+                  Login
+                </Button>
+              </Link>
+            </div>
           )}
         </div>
       </div>

@@ -3,6 +3,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -24,6 +25,16 @@ const LoginPage = () => {
         <CardContent>
           <LoginForm></LoginForm>
         </CardContent>
+        <CardFooter>
+          <div className="flex justify-center items-center w-full">
+            <p>
+              Don&apos;t have an account?{" "}
+              <a href="/register" className="text-blue-500 hover:underline">
+                Sign up
+              </a>
+            </p>
+          </div>
+        </CardFooter>
       </Card>
     </div>
   );
