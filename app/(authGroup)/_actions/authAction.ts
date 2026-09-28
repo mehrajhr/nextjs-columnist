@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 type LoginState = {
   success: boolean;
@@ -43,7 +44,7 @@ export const loginAction = async (
   formData: FormData,
 ) => {
   //   console.log(fromData);
-  console.log(prevState, "Prevstate");
+  // console.log(prevState, "Prevstate");
 
   const email = formData.get("email");
   const password = formData.get("password");
@@ -65,7 +66,7 @@ export const loginAction = async (
 
   const result = await res.json();
 
-  console.log(result);
+  // console.log(result);
 
   if (result.success) {
     const cookieStore = await cookies();
@@ -82,6 +83,19 @@ export const loginAction = async (
       sameSite: "lax",
       maxAge: 60 * 60 * 24 * 7,
     });
+
+    const decodedToken = jwt.decode(result.data.accessToken) as JwtPayload;
+    // console.log(decodedToken, "Decoded Token");
+
+    if (decodedToken && decodedToken.role === "ADMIN") {
+      redirect("/admin-dashboard");
+    } else if (decodedToken && decodedToken.role === "USER") {
+      redirect("/dashboard");
+    } else if (decodedToken && decodedToken.role === "AUTHOR") {
+      redirect("/author-dashboard");
+    }
+
+    // console.log(decodedToken, "Decoded Token");
 
     // server side navigation redirecting
     // redirect("/dashboard", "replace");
