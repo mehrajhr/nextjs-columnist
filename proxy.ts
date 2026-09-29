@@ -1,27 +1,64 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import jwt, { JwtPayload } from "jsonwebtoken";
-
+import { jwtUtils } from "./utils/jwtUtils";
+import { refreshAccessToken } from "./service/refreshToken";
 const AUTH_ROUTES = ["/login", "/register"];
 const PUBLIC_ROUTES = ["/", "/posts", "/login", "/register"];
+import { cookies } from "next/headers";
 
 // This function can be marked `async` if using `await` inside
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
-  const accessToken = request.cookies.get("accessToken")?.value;
+  let accessToken = request.cookies.get("accessToken")?.value;
+  const refreshTokenCookie = request.cookies.get("refreshToken")?.value;
 
-  const decodedToken = accessToken
-    ? (jwt.decode(accessToken) as JwtPayload)
+  let decodedAccessToken = accessToken
+    ? jwtUtils.verifyToken(accessToken, process.env.JWT_ACCESS_SECRET as string)
     : null;
+
+  const decodedRefreshToken = refreshTokenCookie
+    ? jwtUtils.verifyToken(
+        refreshTokenCookie,
+        process.env.JWT_REFRESH_SECRET as string,
+      )
+    : null;
+
+  if (!decodedAccessToken?.success && decodedRefreshToken?.success) {
+    // If the access token is invalid but the refresh token is valid, redirect to the refresh token route
+
+    const result = await refreshAccessToken();
+
+    if (result.success && result.data) {
+      const newAccessToken = result.data.accessToken;
+      const cookieStore = await cookies();
+      cookieStore.set("accessToken", newAccessToken, {
+        httpOnly: true,
+        maxAge: 60 * 60 * 24, // 1 day
+        sameSite: "lax",
+      });
+
+      accessToken = newAccessToken;
+      decodedAccessToken = jwtUtils.verifyToken(
+        newAccessToken,
+        process.env.JWT_ACCESS_SECRET as string,
+      );
+    }
+  }
 
   let userRole = null;
 
-  if (decodedToken) {
-    userRole = decodedToken.role;
+  if (!decodedAccessToken?.success) {
+    request.cookies.delete("accessToken");
+    // return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  if (decodedAccessToken?.success && decodedAccessToken.data) {
+    userRole = (decodedAccessToken.data as JwtPayload).role;
   }
 
   // user is already logged in and trying to access login or register page, redirect to home page
-  if (decodedToken && AUTH_ROUTES.includes(pathname)) {
+  if (decodedAccessToken && AUTH_ROUTES.includes(pathname)) {
     if (userRole === "ADMIN") {
       return NextResponse.redirect(new URL("/admin-dashboard", request.url));
     } else if (userRole === "USER") {
@@ -38,7 +75,7 @@ export function proxy(request: NextRequest) {
   );
 
   // user is not logged in and trying to access a protected route, redirect to login page
-  if (!decodedToken && !isPublicRoute) {
+  if (!decodedAccessToken && !isPublicRoute) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
